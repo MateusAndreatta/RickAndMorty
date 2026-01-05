@@ -16,46 +16,43 @@ enum CharacterListViewState {
 struct CharacterListView: View {
     
     @StateObject private var viewModel: CharacterListViewModel = CharacterListViewModel(service: RickAndMortyService())
-
+    @State private var isLoadingMore: Bool = false
+    
     var body: some View {
-        switch viewModel.viewState {
-        case .data(let characters):
-            ContentView(data: characters)
-        case .error:
-            ErrorView()
-        case .loading:
-            ProgressView()
-                .task {
-                    await viewModel.loadCharacters()
-                }
+        
+        ScrollView {
+            HeaderView()
+            switch viewModel.viewState {
+            case .data(let characters):
+                ContentView(data: characters)
+            case .error:
+                ErrorView()
+            case .loading:
+                ProgressView()
+                    .task {
+                        await viewModel.loadCharacters()
+                    }
+            }
         }
     }
     
     @ViewBuilder
     func ContentView(data: [CharacterModel]) -> some View {
-        ScrollView {
-            
-            VStack {
-                TextField(
-                    "Search for character name..",
-                    text: $viewModel.searchName
-                )
-                .textFieldStyle(.roundedBorder)
-                
-                Picker("Filter", selection: $viewModel.selectedFilter) {
-                    ForEach(Filter.allCases) { filter in
-                        Text(filter.rawValue).tag(filter)
+        LazyVStack {
+            ForEach(data, id: \.id) { character in
+                CharacterItemView(character: character)
+                    .onAppear {
+                        if character.id == data.last?.id {
+                            Task {
+                                guard !isLoadingMore else { return }
+                                isLoadingMore = true
+                                await viewModel.loadCharacters()
+                                isLoadingMore = false
+                            }
+                        }
                     }
-                }
-                .pickerStyle(.segmented)
-            }.padding()
-            
-            LazyVStack {
-                ForEach(data, id: \.id) { character in
-                    CharacterItemView(character: character)
-                }
-            }.padding()
-        }
+            }
+        }.padding()
     }
     
     @ViewBuilder
@@ -67,20 +64,53 @@ struct CharacterListView: View {
         } actions: {
             Button("Try Again") {
                 Task {
-                    await viewModel.loadCharacters()
+                    await viewModel.resetAndReload()
                 }
             }
         }
     }
+    
+    @ViewBuilder
+    func EmptyView() -> some View {
+        ContentUnavailableView {
+            Label("No Results Found", systemImage: "line.3.horizontal.decrease.circle")
+        } description: {
+            Text("Try changing or clearing the filters to see more characters.")
+        } actions: {
+            Button("Clear Filters") {
+                Task {
+                    await viewModel.resetAndReload()
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    func HeaderView() -> some View {
+        VStack {
+            TextField(
+                "Search for character name..",
+                text: $viewModel.searchName
+            )
+            .textFieldStyle(.roundedBorder)
+            
+            Picker("Filter", selection: $viewModel.selectedFilter) {
+                ForEach(Filter.allCases) { filter in
+                    Text(filter.rawValue).tag(filter)
+                }
+            }
+            .pickerStyle(.segmented)
+        }.padding()
+    }
 }
 
 #Preview {
-//    let dummy: [CharacterModel] = [.init(id: 1,
-//                                         name: "Rick And Morty",
-//                                         status: "Alive",
-//                                         species: "Human",
-//                                         image: "https://rickandmortyapi.com/api/character/avatar/2.jpeg",
-//                                         origin: .init(name: "", url: ""),
-//                                         episode: [])]
-//    CharacterListView(state: .data(dummy))
+    let dummy: [CharacterModel] = [.init(id: 1,
+                                         name: "Rick And Morty",
+                                         status: "Alive",
+                                         species: "Human",
+                                         image: "https://rickandmortyapi.com/api/character/avatar/2.jpeg",
+                                         origin: .init(name: "", url: ""),
+                                         episode: [])]
+    CharacterListView()
 }

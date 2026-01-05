@@ -7,13 +7,6 @@
 
 import SwiftUI
 
-/***
- Image
- Name
- Status (Alive/Dead/Unknown)
- Species
- */
-
 struct CharacterItemView: View {
     
     let character: CharacterModel
@@ -40,7 +33,7 @@ struct CharacterItemView: View {
                 Text(character.status)
                 Text("|")
                 Text(character.species)
-            }
+            }.padding(.bottom)
         }
         .frame(maxWidth: .infinity)
         .border(.black)
