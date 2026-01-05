@@ -9,9 +9,18 @@ import SwiftUI
 
 @main
 struct RickAndMortyApp: App {
+    
+    let container = DependencyContainer(
+        service: RickAndMortyService(),
+    )
+    
     var body: some Scene {
         WindowGroup {
-            CharacterListView()
+            NavigationStack {
+                CharacterListView(viewModel: container.makeCharacterListViewModel(),
+                                  container: container)
+                    .navigationTitle("Rick And Morty")
+            }
         }
     }
 }

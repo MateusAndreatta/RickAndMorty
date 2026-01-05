@@ -20,8 +20,9 @@ struct CharacterItemView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                 } else if phase.error != nil {
-                    Text(phase.error?.localizedDescription ?? "")
-                    Color.red.frame(height: 100)
+                    Image("placeholder")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
                 } else {
                     ProgressView()
                         .frame(height: 200)
@@ -48,6 +49,7 @@ struct CharacterItemView: View {
                                        status: "Alive",
                                        species: "Human",
                                        image: "https://rickandmortyapi.com/api/character/avatar/2.jpeg",
+                                       gender: "Male",
                                        origin: .init(name: "", url: ""),
                                        episode: []))
 }

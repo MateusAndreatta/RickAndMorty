@@ -4,19 +4,14 @@
 //
 //  Created by Mateus Andreatta on 1/4/26.
 //
-import Foundation
 
-protocol RickAndMortyServiceProtocol {
-    func fetchCharacterList(page: Int, name: String, filter: String) async -> Result<CharactersResponseModel, ApiError>
-    func fetchCharacterDetails(id: Int) async -> Result<CharacterModel, ApiError>
-}
+import Foundation
 
 final class RickAndMortyService: RickAndMortyServiceProtocol {
     func fetchCharacterList(page: Int, name: String, filter: String) async -> Result<CharactersResponseModel, ApiError> {
         guard let url = RickAndMortyEndpoint.characterList(page: page, name: name, filter: filter).url else {
             return .failure(.unknown)
         }
-
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
             let decoded = try JSONDecoder().decode(CharactersResponseModel.self, from: data)

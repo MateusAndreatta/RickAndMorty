@@ -13,6 +13,7 @@ struct CharacterModel: Codable {
     let status: String
     let species: String
     let image: String
+    let gender: String
     let origin: OriginModel
     let episode: [String]
 }

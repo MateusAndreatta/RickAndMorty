@@ -14,9 +14,10 @@ enum CharacterListViewState {
 }
 
 struct CharacterListView: View {
-    
-    @StateObject private var viewModel: CharacterListViewModel = CharacterListViewModel(service: RickAndMortyService())
+    @StateObject var viewModel: CharacterListViewModel
     @State private var isLoadingMore: Bool = false
+    
+    let container: DependencyContainer
     
     var body: some View {
         
@@ -24,7 +25,11 @@ struct CharacterListView: View {
             HeaderView()
             switch viewModel.viewState {
             case .data(let characters):
-                ContentView(data: characters)
+                if characters.isEmpty {
+                    EmptyView()
+                } else {
+                    ContentView(data: characters)
+                }
             case .error:
                 ErrorView()
             case .loading:
@@ -40,17 +45,20 @@ struct CharacterListView: View {
     func ContentView(data: [CharacterModel]) -> some View {
         LazyVStack {
             ForEach(data, id: \.id) { character in
-                CharacterItemView(character: character)
-                    .onAppear {
-                        if character.id == data.last?.id {
-                            Task {
-                                guard !isLoadingMore else { return }
-                                isLoadingMore = true
-                                await viewModel.loadCharacters()
-                                isLoadingMore = false
-                            }
+                NavigationLink(destination: CharacterDetailsView(viewModel: container.makeCharacterDetailsViewModel(id: character.id))) {
+                    CharacterItemView(character: character)
+                }
+                .buttonStyle(.plain)
+                .onAppear {
+                    if character.id == data.last?.id {
+                        Task {
+                            guard !isLoadingMore else { return }
+                            isLoadingMore = true
+                            await viewModel.loadCharacters()
+                            isLoadingMore = false
                         }
                     }
+                }
             }
         }.padding()
     }
@@ -105,12 +113,6 @@ struct CharacterListView: View {
 }
 
 #Preview {
-    let dummy: [CharacterModel] = [.init(id: 1,
-                                         name: "Rick And Morty",
-                                         status: "Alive",
-                                         species: "Human",
-                                         image: "https://rickandmortyapi.com/api/character/avatar/2.jpeg",
-                                         origin: .init(name: "", url: ""),
-                                         episode: [])]
-    CharacterListView()
+    let viewModel = CharacterListViewModel(service: MockRickAndMortyService())
+    CharacterListView(viewModel: viewModel, container: DependencyContainer(service: MockRickAndMortyService()))
 }
