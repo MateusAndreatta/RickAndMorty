@@ -8,5 +8,6 @@
 import Foundation
 
 enum ApiError: Error {
-    case decodingError
+    case unknown
+    case network(Error)
 }
