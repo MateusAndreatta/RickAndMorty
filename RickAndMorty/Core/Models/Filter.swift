@@ -12,4 +12,13 @@ enum Filter: String, CaseIterable, Identifiable {
     case unknown = "Unknown"
     
     var id: String { self.rawValue }
+    
+    var filterValue: String {
+        switch self {
+        case .all:
+            return ""
+        default:
+            return self.rawValue
+        }
+    }
 }
