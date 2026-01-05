@@ -40,11 +40,6 @@
 			path = RickAndMortyTests;
 			sourceTree = "<group>";
 		};
-		3971C3A62F0B404600E57706 /* RickAndMortyUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = RickAndMortyUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,7 +72,6 @@
 			children = (
 				3971C38E2F0B404200E57706 /* RickAndMorty */,
 				3971C39C2F0B404500E57706 /* RickAndMortyTests */,
-				3971C3A62F0B404600E57706 /* RickAndMortyUITests */,
 				3971C38D2F0B404200E57706 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -152,9 +146,6 @@
 			);
 			dependencies = (
 				3971C3A52F0B404600E57706 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				3971C3A62F0B404600E57706 /* RickAndMortyUITests */,
 			);
 			name = RickAndMortyUITests;
 			packageProductDependencies = (
