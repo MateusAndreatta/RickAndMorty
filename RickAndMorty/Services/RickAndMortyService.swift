@@ -8,12 +8,19 @@
 import Foundation
 
 final class RickAndMortyService: RickAndMortyServiceProtocol {
+    
+    private let session: URLSessionProtocol
+    
+    init(session: URLSessionProtocol) {
+        self.session = session
+    }
+    
     func fetchCharacterList(page: Int, name: String, filter: String) async -> Result<CharactersResponseModel, ApiError> {
         guard let url = RickAndMortyEndpoint.characterList(page: page, name: name, filter: filter).url else {
             return .failure(.unknown)
         }
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let (data, _) = try await session.data(from: url)
             let decoded = try JSONDecoder().decode(CharactersResponseModel.self, from: data)
             return .success(decoded)
         } catch {
@@ -27,7 +34,7 @@ final class RickAndMortyService: RickAndMortyServiceProtocol {
         }
 
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let (data, _) = try await session.data(from: url)
             let decoded = try JSONDecoder().decode(CharacterModel.self, from: data)
             return .success(decoded)
         } catch {

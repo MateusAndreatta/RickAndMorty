@@ -11,7 +11,7 @@ import SwiftUI
 struct RickAndMortyApp: App {
     
     let container = DependencyContainer(
-        service: RickAndMortyService(),
+        service: RickAndMortyService(session: URLSession.shared),
     )
     
     var body: some Scene {
